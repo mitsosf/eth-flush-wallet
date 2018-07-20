@@ -11,26 +11,32 @@ interface ERC20 {
     event Approval(address indexed _owner, address indexed _spender, uint _value);
     }
 
-contract Wallet { 
+contract Wallet {
+    //Forwards all ETH, supports ERC-20 tokens
 
     bool avoidReentrancy = false;
-    
+    address private owner;
+    address private forwardingAddress;
+
+    constructor(address toForward) public {
+       owner = msg.sender;
+       forwardingAddress = toForward;
+   }
 
     function () public payable {
+        forwardingAddress.transfer(msg.value);
     }
 
-    function transferTo(address to, uint256 amount) public{
-        require(!avoidReentrancy);
-        avoidReentrancy = true;
-        to.transfer(amount);
-        avoidReentrancy = false;
-    }
-
-    function transferTokensTo(address token, address to, uint256 amount) public{
+    function transferTokensTo(address token, address to, uint256 amount) public onlyOwner{
         require(!avoidReentrancy);
         avoidReentrancy = true;
         ERC20(token).transfer(to, amount);
         avoidReentrancy = false;
     }
 
+    //Reserve access only for the owner
+    modifier onlyOwner() {
+        require(msg.sender == owner);
+        _;
+    }
 }
