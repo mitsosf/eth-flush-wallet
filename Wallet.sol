@@ -12,7 +12,6 @@ interface ERC20 {
     }
 
 contract Wallet {
-    //Forwards all ETH, supports ERC-20 tokens
 
     bool avoidReentrancy = false;
     address private owner;
@@ -21,12 +20,13 @@ contract Wallet {
     constructor(address toForward) public {
        owner = msg.sender;
        forwardingAddress = toForward;
-   }
+    }
 
     function () public payable {
         forwardingAddress.transfer(msg.value);
     }
 
+    //Transfer tokens out of the contract
     function transferTokensTo(address token, address to, uint256 amount) public onlyOwner{
         require(!avoidReentrancy);
         avoidReentrancy = true;
@@ -34,9 +34,20 @@ contract Wallet {
         avoidReentrancy = false;
     }
 
+    //Change the address you wish the ETH to be forwarded to
+    function changeForwardingAddress(address newAddress) public onlyOwner{
+        forwardingAddress = newAddress;
+    }
+
+    //Change the current owner
+    function changeOwner(address newOwner) public onlyOwner{
+        owner = newOwner;
+    }
+
     //Reserve access only for the owner
     modifier onlyOwner() {
         require(msg.sender == owner);
         _;
     }
+
 }
