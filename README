@@ -1,1 +1,4 @@
 Ethereum Wallet Contract with automatic Forwarding Function
+
+This contract, after being deployed, acts as a wallet that automatically forwards deposited ETH to a predetermined address.
+Can, at the same time, support ERC-20 tokens, giving the contract owner the ability to move them, once they're in the contract. 
